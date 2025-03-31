@@ -1,153 +1,311 @@
-"use client"; // Mark this as a Client Component
-
+"use client";
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import Image from "next/image"; // Import the Image component
+import Image from "next/image";
+
+interface NavItem {
+  name: string;
+  href: `#${string}`;
+}
 
 const inActiveStyle = "text-white/50 hover:bg-white/40 hover:text-white/80";
 const activeStyle = "bg-gradient-to-b from-white/40 to-[#2F2D2D]/20";
 const linkStyles = "rounded-full px-4 py-1 transition-all text-sm";
 
-interface NavItem {
-  name: string;
-  href: string;
-  isActive?: boolean;
+const NAV_ITEMS: NavItem[] = [
+  { name: "Home", href: "#home" },
+  { name: "About", href: "#about" },
+  { name: "Projects", href: "#projects" },
+  { name: "Blog", href: "#blog" },
+  { name: "Contact", href: "#contact" },
+];
+
+interface SpringTransition {
+  type: "spring";
+  stiffness?: number;
+  damping?: number;
+  mass?: number;
+  delay?: number;
+  duration?: number;
 }
 
+const defaultSpring: SpringTransition = {
+  type: "spring",
+  stiffness: 300,
+  damping: 30,
+  mass: 0.5,
+};
+
 export default function Navbar() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
+  const [scrolled, setScrolled] = useState<boolean>(false);
+  const [activeSection, setActiveSection] = useState<string>("home");
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
-  const [navMenu, setNavMenu] = useState<NavItem[]>([
-    { name: "Home", href: "/", isActive: pathname === "/" },
-    { name: "About", href: "/#about", isActive: pathname === "/#about" },
-    { name: "Videos", href: "/#videos", isActive: pathname === "/#videos" },
-    { name: "Projects", href: "/#projects", isActive: pathname === "/#projects" },
-    { name: "Blog", href: "/posts", isActive: pathname === "/posts" },
-  ]);
-
-  // Update the active state of nav items when the pathname changes
   useEffect(() => {
-    setNavMenu((prevNavMenu) =>
-      prevNavMenu.map((item) => ({
-        ...item,
-        isActive: item.href === pathname,
-      }))
-    );
-  }, [pathname]);
+    setIsMounted(true);
+  }, []);
 
-  return (
-    <div className="mx-auto max-w-[1440px]">
-      {/* Make the header fixed */}
-      <header className="fixed inset-x-0 top-0 z-50">
-        {/* Navbar with logo on the left for small/medium screens and right for large screens */}
-        <nav
-          aria-label="Global"
-          className="flex items-center justify-between p-3 lg:px-6 backdrop-blur-sm" // Adjusted padding and flex alignment
-        >
-          {/* Logo on the left for small/medium screens, right for large screens */}
-          <div className="flex items-center lg:order-2 lg:pl-[60px]">
-            {" "}
-            {/* Move logo to the right on large screens */}
-            <Link href="/">
-              <Image
-                src="/images/Faiezlogo.png" // Replace with your logo path
-                alt="Logo"
-                width={80} // Increased width
-                height={80} // Increased height
-                className="h-10 w-auto lg:h-14" // Responsive size
-              />
-            </Link>
-          </div>
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
 
-          {/* Mobile Menu Button (Aligned to the right for small/medium screens) */}
-          <div className="flex lg:hidden lg:order-1">
+      const scrollPosition = window.scrollY + 100;
+      for (const item of NAV_ITEMS) {
+        const sectionId = item.href.substring(1);
+        const section = document.getElementById(sectionId);
+
+        if (section) {
+          const { offsetTop, offsetHeight } = section;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveSection(sectionId);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionId: string): void => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+      setActiveSection(sectionId);
+      setMobileMenuOpen(false);
+    }
+  };
+
+  if (!isMounted) {
+    return (
+      <header className="fixed inset-x-0 top-0 z-50 bg-transparent backdrop-blur-sm">
+        <nav className="flex items-center justify-between p-3 lg:px-6 max-w-[1440px] mx-auto">
+          <div className="flex items-center lg:order-2 lg:pl-[70px]">
             <button
-              type="button"
-              onClick={() => setMobileMenuOpen(true)}
-              className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+              onClick={() => scrollToSection("home")}
+              className="focus:outline-none"
+              aria-label="Home"
             >
-              <span className="sr-only">Open main menu</span>
-              <Bars3Icon aria-hidden="true" className="h-7 w-7 text-white" />
+              <Image
+                src="/images/Faiezlogo.png"
+                alt="Logo"
+                width={80}
+                height={80}
+                className="h-10 w-auto lg:h-14"
+                priority
+              />
             </button>
           </div>
-
-          {/* Centered Navigation Links (Desktop) */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 hidden gap-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-700 px-4 py-1 text-white lg:flex lg:items-center lg:gap-x-8 lg:order-1">
-            {" "}
-            {/* Ensure links are centered on large screens */}
-            {navMenu.map((item) => (
-              <Link
+          <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2 gap-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-700 px-4 py-1 text-white lg:items-center lg:gap-x-8">
+            {NAV_ITEMS.map((item) => (
+              <button
                 key={item.name}
-                href={item.href}
+                onClick={() => scrollToSection(item.href.substring(1))}
                 className={clsx(linkStyles, {
-                  [activeStyle]: item.isActive,
-                  [inActiveStyle]: !item.isActive,
+                  [activeStyle]: activeSection === item.href.substring(1),
+                  [inActiveStyle]: activeSection !== item.href.substring(1),
                 })}
-                aria-current={item.isActive ? "page" : undefined}
+                aria-current={
+                  activeSection === item.href.substring(1) ? "page" : undefined
+                }
               >
                 {item.name}
-              </Link>
+              </button>
             ))}
           </div>
         </nav>
+      </header>
+    );
+  }
 
-        {/* Mobile Menu (Dialog) */}
-        <Dialog
-          open={mobileMenuOpen}
-          onClose={setMobileMenuOpen}
-          className="lg:hidden"
+  return (
+    <motion.header
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className={`fixed inset-x-0 top-0 z-50 ${
+        scrolled
+          ? "bg-black/50 backdrop-blur-md"
+          : "bg-transparent backdrop-blur-sm"
+      }`}
+    >
+      <nav className="flex items-center justify-between p-3 lg:px-6 max-w-[1440px] mx-auto">
+        {/* Logo */}
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={defaultSpring}
+          className="flex items-center lg:order-2 lg:pl-[60px]"
         >
-          <div className="fixed inset-0 z-50" />
-          <DialogPanel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-bg-default px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
-            <div className="relative z-50">
-              <div className="flex items-center justify-between">
-                {/* Logo in mobile menu */}
-                <Link href="/">
-                  <Image
-                    src="/images/Faiezlogo.png" // Replace with your logo path
-                    alt="Logo"
-                    width={60} // Increased width
-                    height={60} // Increased height
-                    className="h-12 w-auto" // Increased size
-                  />
-                </Link>
-                <button
-                  type="button"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="-m-2.5 rounded-md p-2.5 text-gray-700"
-                >
-                  <span className="sr-only">Close menu</span>
-                  <XMarkIcon
-                    aria-hidden="true"
-                    className="h-7 w-7 text-white"
-                  />
-                </button>
-              </div>
-              <div className="mt-6 flow-root">
-                <div className="-my-6 divide-y divide-gray-500/10">
-                  <div className="space-y-2 py-6 text-center">
-                    {navMenu.map((item) => (
-                      <Link
-                        key={item.name + 1}
-                        href={item.href}
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="-mx-3 block rounded-lg px-3 py-2 text-xl font-normal leading-7 text-white transition-all hover:bg-gray-50/20"
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+          <button
+            onClick={() => scrollToSection("home")}
+            className="focus:outline-none"
+            aria-label="Home"
+          >
+            <Image
+              src="/images/Faiezlogo.png"
+              alt="Logo"
+              width={80}
+              height={80}
+              className="h-10 w-auto lg:h-14"
+              priority
+            />
+          </button>
+        </motion.div>
+
+        {/* Mobile Menu Button */}
+        <motion.div
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={defaultSpring}
+          className="flex lg:hidden"
+        >
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-white"
+            aria-label="Open menu"
+          >
+            <Bars3Icon className="h-7 w-7" />
+          </button>
+        </motion.div>
+
+        {/* Desktop Navigation Links */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2 gap-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-700 px-4 py-1 text-white lg:items-center lg:gap-x-8"
+        >
+          {NAV_ITEMS.map((item) => {
+            const sectionId = item.href.substring(1);
+            return (
+              <motion.button
+                key={item.name}
+                onClick={() => scrollToSection(sectionId)}
+                className={clsx(linkStyles, {
+                  [activeStyle]: activeSection === sectionId,
+                  [inActiveStyle]: activeSection !== sectionId,
+                })}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={defaultSpring}
+                aria-current={activeSection === sectionId ? "page" : undefined}
+              >
+                {item.name}
+              </motion.button>
+            );
+          })}
+        </motion.div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <Dialog
+              open={mobileMenuOpen}
+              onClose={setMobileMenuOpen}
+              className="lg:hidden"
+              as={motion.div}
+              static
+            >
+              {/* Backdrop */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="fixed inset-0 z-50 bg-black/30 backdrop-blur-[2px]"
+              />
+
+              {/* Mobile Menu Panel */}
+              <DialogPanel
+                as={motion.div}
+                initial={{ x: "100%", scale: 0.95 }}
+                animate={{ x: 0, scale: 1 }}
+                exit={{ x: "100%" }}
+                transition={true}
+                className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-black/40 backdrop-blur-lg px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10"
+              >
+                <div className="flex items-center justify-between">
+                  <motion.button
+                    onClick={() => scrollToSection("home")}
+                    className="focus:outline-none"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    transition={defaultSpring}
+                    aria-label="Home"
+                  >
+                    <Image
+                      src="/images/Faiezlogo.png"
+                      alt="Logo"
+                      width={60}
+                      height={60}
+                      className="h-12 w-auto"
+                    />
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="-m-2.5 rounded-md p-2.5 text-white"
+                    whileHover={{ rotate: 90, scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={defaultSpring}
+                    aria-label="Close menu"
+                  >
+                    <XMarkIcon className="h-7 w-7" />
+                  </motion.button>
+                </div>
+                <div className="mt-6 flow-root">
+                  <div className="-my-6 divide-y divide-gray-500/10">
+                    <div className="space-y-2 py-6 text-center">
+                      {NAV_ITEMS.map((item, index) => {
+                        const sectionId = item.href.substring(1);
+                        return (
+                          <motion.button
+                            key={item.name}
+                            onClick={() => scrollToSection(sectionId)}
+                            className={clsx(
+                              "-mx-3 block rounded-lg px-3 py-4 text-xl font-medium leading-7 text-white transition-all hover:bg-white/10 w-full",
+                              {
+                                "bg-white/10": activeSection === sectionId,
+                                "text-white/70": activeSection !== sectionId,
+                              }
+                            )}
+                            initial={{ opacity: 0, x: 30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{
+                              delay: index * 0.07,
+                              type: "spring",
+                              stiffness: 300,
+                              damping: 20,
+                            }}
+                            whileHover={{ x: 5 }}
+                            whileTap={{ scale: 0.98 }}
+                            aria-current={
+                              activeSection === sectionId ? "page" : undefined
+                            }
+                          >
+                            {item.name}
+                          </motion.button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          </DialogPanel>
-        </Dialog>
-      </header>
-    </div>
+              </DialogPanel>
+            </Dialog>
+          )}
+        </AnimatePresence>
+      </nav>
+    </motion.header>
   );
 }
