@@ -15,11 +15,11 @@ const NAV_ITEMS = [
   { name: "Contact", href: "#contact" },
 ] as const;
 
-// Interfaces
-interface NavItem {
+// Types
+type NavItem = {
   name: string;
   href: `#${string}`;
-}
+};
 
 // Styles
 const LINK_STYLES = {
@@ -34,7 +34,7 @@ const LINK_STYLES = {
 };
 
 const SPRING_CONFIG = {
-  type: "spring" as const,
+  type: "spring",
   stiffness: 300,
   damping: 30,
   mass: 0.5,
@@ -44,15 +44,13 @@ export default function Navbar() {
   // State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState(NAV_ITEMS[0].href.substring(1));
+  const [activeSection, setActiveSection] = useState("home");
   const [isMounted, setIsMounted] = useState(false);
 
   // Effects
   useEffect(() => {
     setIsMounted(true);
-  }, []);
 
-  useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 10);
       updateActiveSection();
@@ -76,7 +74,6 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
-    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -87,15 +84,13 @@ export default function Navbar() {
       section.scrollIntoView({ behavior: "smooth" });
       setActiveSection(sectionId);
       setMobileMenuOpen(false);
+    } else {
+      console.error(`Section not found: ${sectionId}`);
     }
   };
 
   // Render
-  if (typeof window === 'undefined') {
-    return <div className="h-16 bg-transparent" />;
-  }
-
-  if (!isMounted) {
+  if (!isMounted || typeof window === 'undefined') {
     return <div className="h-16 bg-transparent" />;
   }
 
@@ -123,11 +118,15 @@ export default function Navbar() {
           >
             <Image
               src="/images/Faiezlogo.png"
-              alt="Logo"
+              alt="Website Logo"
               width={80}
               height={80}
               className="h-10 w-auto lg:h-14"
               priority
+              onError={(e) => {
+                console.error("Failed to load logo");
+                e.currentTarget.src = "/placeholder-logo.png";
+              }}
             />
           </button>
         </motion.div>
@@ -149,7 +148,7 @@ export default function Navbar() {
           </button>
         </motion.div>
 
-        {/* Desktop Navigation Links */}
+        {/* Desktop Navigation */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -218,6 +217,10 @@ export default function Navbar() {
                         width={60}
                         height={60}
                         className="h-12 w-auto"
+                        onError={(e) => {
+                          console.error("Failed to load mobile logo");
+                          e.currentTarget.src = "/placeholder-logo.png";
+                        }}
                       />
                     </motion.button>
                     <motion.button
