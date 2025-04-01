@@ -1,24 +1,27 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Image from "next/image";
 
-interface NavItem {
-  name: string;
-  href: `#${string}`;
-}
-
-const NAV_ITEMS: NavItem[] = [
+// Constants
+const NAV_ITEMS = [
   { name: "Home", href: "#home" },
   { name: "About", href: "#about" },
   { name: "Projects", href: "#projects" },
   { name: "Blog", href: "#blog" },
   { name: "Contact", href: "#contact" },
-];
+] as const;
 
+// Interfaces
+interface NavItem {
+  name: string;
+  href: `#${string}`;
+}
+
+// Styles
 const LINK_STYLES = {
   base: "rounded-full px-4 py-1 transition-all text-sm",
   inactive: "text-white/50 hover:bg-white/40 hover:text-white/80",
@@ -38,11 +41,13 @@ const SPRING_CONFIG = {
 };
 
 export default function Navbar() {
+  // State
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
+  const [activeSection, setActiveSection] = useState(NAV_ITEMS[0].href.substring(1));
   const [isMounted, setIsMounted] = useState(false);
 
+  // Effects
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -75,6 +80,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Handlers
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -84,29 +90,13 @@ export default function Navbar() {
     }
   };
 
+  // Render
+  if (typeof window === 'undefined') {
+    return <div className="h-16 bg-transparent" />;
+  }
+
   if (!isMounted) {
-    return (
-      <header className="fixed inset-x-0 top-0 z-50 bg-transparent backdrop-blur-sm">
-        <nav className="flex items-center justify-between p-3 lg:px-6 max-w-[1440px] mx-auto">
-          <div className="flex items-center lg:order-2 lg:pl-[70px]">
-            <button
-              onClick={() => scrollToSection("home")}
-              className="focus:outline-none"
-              aria-label="Home"
-            >
-              <Image
-                src="/images/Faiezlogo.png"
-                alt="Logo"
-                width={80}
-                height={80}
-                className="h-10 w-auto lg:h-14"
-                priority
-              />
-            </button>
-          </div>
-        </nav>
-      </header>
-    );
+    return <div className="h-16 bg-transparent" />;
   }
 
   return (
@@ -188,106 +178,97 @@ export default function Navbar() {
         </motion.div>
 
         {/* Mobile Menu */}
-        <Transition show={mobileMenuOpen}>
-          <Dialog
-            as="div"
-            className="lg:hidden fixed inset-0 z-50"
-            onClose={setMobileMenuOpen}
-            static
-          >
-            <AnimatePresence>
-              {mobileMenuOpen && (
-                <>
-                  {/* Backdrop */}
-                  <Transition.Child
-                    as={motion.div}
-                    enter="ease-out duration-300"
-                    enterFrom="opacity-0"
-                    enterTo="opacity-100"
-                    leave="ease-in duration-200"
-                    leaveFrom="opacity-100"
-                    leaveTo="opacity-0"
-                    className="fixed inset-0 bg-black/30 backdrop-blur-[2px]"
-                  />
+        <Transition.Root show={mobileMenuOpen} as={Fragment}>
+          <Dialog as="div" className="relative z-50 lg:hidden" onClose={setMobileMenuOpen}>
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
+            </Transition.Child>
 
-                  {/* Mobile Menu Panel */}
-                  <Transition.Child
-                    as={motion.div}
-                    enter="transform transition ease-in-out duration-300 sm:duration-500"
-                    enterFrom="translate-x-full"
-                    enterTo="translate-x-0"
-                    leave="transform transition ease-in-out duration-300 sm:duration-500"
-                    leaveFrom="translate-x-0"
-                    leaveTo="translate-x-full"
-                    className="fixed inset-y-0 right-0 w-full overflow-y-auto bg-black/40 backdrop-blur-lg px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10"
-                  >
-                    <div className="flex items-center justify-between">
-                      <motion.button
-                        onClick={() => scrollToSection("home")}
-                        className="focus:outline-none"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        transition={SPRING_CONFIG}
-                        aria-label="Home"
-                      >
-                        <Image
-                          src="/images/Faiezlogo.png"
-                          alt="Logo"
-                          width={60}
-                          height={60}
-                          className="h-12 w-auto"
-                        />
-                      </motion.button>
-                      <motion.button
-                        type="button"
-                        onClick={() => setMobileMenuOpen(false)}
-                        className="-m-2.5 rounded-md p-2.5 text-white"
-                        whileHover={{ rotate: 90, scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        transition={SPRING_CONFIG}
-                        aria-label="Close menu"
-                      >
-                        <XMarkIcon className="h-7 w-7" />
-                      </motion.button>
-                    </div>
-                    <div className="mt-6 flow-root">
-                      <div className="-my-6 divide-y divide-gray-500/10">
-                        <div className="space-y-2 py-6 text-center">
-                          {NAV_ITEMS.map((item, index) => {
-                            const sectionId = item.href.substring(1);
-                            return (
-                              <motion.button
-                                key={item.name}
-                                onClick={() => scrollToSection(sectionId)}
-                                className={clsx(
-                                  LINK_STYLES.mobile.base,
-                                  activeSection === sectionId
-                                    ? LINK_STYLES.mobile.active
-                                    : LINK_STYLES.mobile.inactive
-                                )}
-                                initial={{ opacity: 0, x: 30 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{
-                                  delay: index * 0.07,
-                                  ...SPRING_CONFIG,
-                                }}
-                                whileHover={{ x: 5 }}
-                                whileTap={{ scale: 0.98 }}
-                                aria-current={activeSection === sectionId ? "page" : undefined}
-                              >
-                                {item.name}
-                              </motion.button>
-                            );
-                          })}
-                        </div>
+            <div className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto">
+              <Transition.Child
+                as={Fragment}
+                enter="transform transition ease-in-out duration-300 sm:duration-500"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transform transition ease-in-out duration-300 sm:duration-500"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <Dialog.Panel className="relative h-full w-full bg-black/40 backdrop-blur-lg px-6 py-6 sm:max-w-sm">
+                  <div className="flex items-center justify-between">
+                    <motion.button
+                      onClick={() => scrollToSection("home")}
+                      className="focus:outline-none"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      transition={SPRING_CONFIG}
+                      aria-label="Home"
+                    >
+                      <Image
+                        src="/images/Faiezlogo.png"
+                        alt="Logo"
+                        width={60}
+                        height={60}
+                        className="h-12 w-auto"
+                      />
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="-m-2.5 rounded-md p-2.5 text-white"
+                      whileHover={{ rotate: 90, scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      transition={SPRING_CONFIG}
+                      aria-label="Close menu"
+                    >
+                      <XMarkIcon className="h-7 w-7" />
+                    </motion.button>
+                  </div>
+                  <div className="mt-6 flow-root">
+                    <div className="-my-6 divide-y divide-gray-500/10">
+                      <div className="space-y-2 py-6 text-center">
+                        {NAV_ITEMS.map((item, index) => {
+                          const sectionId = item.href.substring(1);
+                          return (
+                            <motion.button
+                              key={item.name}
+                              onClick={() => scrollToSection(sectionId)}
+                              className={clsx(
+                                LINK_STYLES.mobile.base,
+                                activeSection === sectionId
+                                  ? LINK_STYLES.mobile.active
+                                  : LINK_STYLES.mobile.inactive
+                              )}
+                              initial={{ opacity: 0, x: 30 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{
+                                delay: index * 0.07,
+                                ...SPRING_CONFIG,
+                              }}
+                              whileHover={{ x: 5 }}
+                              whileTap={{ scale: 0.98 }}
+                              aria-current={activeSection === sectionId ? "page" : undefined}
+                            >
+                              {item.name}
+                            </motion.button>
+                          );
+                        })}
                       </div>
                     </div>
-                  </Transition.Child>
-                </>
-              )}
-            </AnimatePresence>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
           </Dialog>
-        </Transition>
+        </Transition.Root>
       </nav>
     </motion.header>
   );
