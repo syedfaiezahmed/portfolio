@@ -11,25 +11,57 @@ import {
 } from "react-icons/fi";
 import { motion } from "framer-motion";
 
+type FormData = {
+  name: string;
+  email: string;
+  message: string;
+};
+
 export default function Contact() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setError(null); // Clear error when user types
+  };
+
+  const validateForm = () => {
+    if (!formData.name.trim()) {
+      setError("Name is required");
+      return false;
+    }
+    if (!formData.email.trim()) {
+      setError("Email is required");
+      return false;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError("Please enter a valid email");
+      return false;
+    }
+    if (!formData.message.trim()) {
+      setError("Message is required");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     setIsSubmitting(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/send", {
@@ -38,12 +70,16 @@ export default function Contact() {
         body: JSON.stringify(formData),
       });
 
-      if (!response.ok) throw new Error("Failed to send");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
 
       setSubmitSuccess(true);
       setFormData({ name: "", email: "", message: "" });
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      console.error("Error:", error);
+      setError(error instanceof Error ? error.message : "Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -60,8 +96,7 @@ export default function Contact() {
             </span>
           </h2>
           <p className="text-sm md:text-base text-[#ADB7BE] max-w-xs md:max-w-2xl mx-auto">
-            Have a project in mind or want to collaborate? I'd love to hear from
-            you!
+            Have a project in mind or want to collaborate? I'd love to hear from you!
           </p>
         </div>
 
@@ -153,6 +188,12 @@ export default function Contact() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                {error && (
+                  <div className="p-3 text-sm text-red-400 bg-red-900/20 rounded-md border border-red-800">
+                    {error}
+                  </div>
+                )}
+
                 <div>
                   <label
                     htmlFor="name"
@@ -170,7 +211,6 @@ export default function Contact() {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      required
                       className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
                       placeholder="John Doe"
                     />
@@ -194,7 +234,6 @@ export default function Contact() {
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
-                      required
                       className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
                       placeholder="john@example.com"
                     />
@@ -218,7 +257,6 @@ export default function Contact() {
                       rows={4}
                       value={formData.message}
                       onChange={handleChange}
-                      required
                       className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
                       placeholder="Let's talk about your project..."
                     />
