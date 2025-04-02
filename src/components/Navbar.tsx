@@ -1,12 +1,12 @@
 "use client";
 import { useState, useEffect, Fragment } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Dialog, Transition } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import clsx from "clsx";
 import Image from "next/image";
 
-// Constants
+// Navigation configuration
 const NAV_ITEMS = [
   { name: "Home", href: "#home" },
   { name: "About", href: "#about" },
@@ -15,13 +15,13 @@ const NAV_ITEMS = [
   { name: "Contact", href: "#contact" },
 ] as const;
 
-// Types
+// Type definitions
 type NavItem = {
   name: string;
   href: `#${string}`;
 };
 
-// Styles
+// Styling constants
 const LINK_STYLES = {
   base: "rounded-full px-4 py-1 transition-all text-sm",
   inactive: "text-white/50 hover:bg-white/40 hover:text-white/80",
@@ -33,6 +33,7 @@ const LINK_STYLES = {
   },
 };
 
+// Animation configuration
 const SPRING_CONFIG = {
   type: "spring",
   stiffness: 300,
@@ -41,13 +42,13 @@ const SPRING_CONFIG = {
 };
 
 export default function Navbar() {
-  // State
+  // State management
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isMounted, setIsMounted] = useState(false);
 
-  // Effects
+  // Handle scroll behavior and section detection
   useEffect(() => {
     setIsMounted(true);
 
@@ -74,10 +75,11 @@ export default function Navbar() {
     };
 
     window.addEventListener("scroll", handleScroll);
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Handlers
+  // Smooth scrolling to sections with error handling
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
@@ -89,7 +91,7 @@ export default function Navbar() {
     }
   };
 
-  // Render
+  // Handle server-side rendering
   if (!isMounted || typeof window === 'undefined') {
     return <div className="h-16 bg-transparent" />;
   }
@@ -104,7 +106,7 @@ export default function Navbar() {
       }`}
     >
       <nav className="flex items-center justify-between p-3 lg:px-6 max-w-[1440px] mx-auto">
-        {/* Logo */}
+        {/* Logo with error handling */}
         <motion.div
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -117,7 +119,7 @@ export default function Navbar() {
             aria-label="Home"
           >
             <Image
-              src="/images/Faiezlogo.png"
+              src="/images/logo.png"
               alt="Website Logo"
               width={80}
               height={80}
@@ -176,7 +178,7 @@ export default function Navbar() {
           })}
         </motion.div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu with proper Transition structure */}
         <Transition.Root show={mobileMenuOpen} as={Fragment}>
           <Dialog as="div" className="relative z-50 lg:hidden" onClose={setMobileMenuOpen}>
             <Transition.Child
@@ -212,7 +214,7 @@ export default function Navbar() {
                       aria-label="Home"
                     >
                       <Image
-                        src="/images/Faiezlogo.png"
+                        src="/images/logo.png"
                         alt="Logo"
                         width={60}
                         height={60}
