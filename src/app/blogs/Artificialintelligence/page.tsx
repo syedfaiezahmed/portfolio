@@ -53,7 +53,7 @@ const ArtificialIntelligenceBlog = () => {
             className="flex items-center"
           >
             <FiClock className="mr-1.5 text-blue-400" />
-            July 5, 2025 · 10 min read
+            Mar 5, 2025 · 10 min read
           </motion.div>
         </div>
       </motion.header>

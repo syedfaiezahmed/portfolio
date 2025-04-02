@@ -53,7 +53,7 @@ const DigitalMarketingBlog = () => {
             className="flex items-center"
           >
             <FiClock className="mr-1.5 text-blue-400" />
-            April 28, 2025 · 6 min read
+            Jan 28, 2025 · 6 min read
           </motion.div>
         </div>
       </motion.header>

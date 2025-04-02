@@ -34,7 +34,7 @@ const WebDevelopmentBlog = () => {
     title: "Modern Web Development in 2025",
     category: "Web Development",
     author: "Syed Faiez Ahmed",
-    date: "May 15, 2025",
+    date: "Feb 18, 2025",
     readTime: 8,
     imageUrl: "https://images.unsplash.com/photo-1547658719-da2b51169166?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1528&q=80",
     content: {

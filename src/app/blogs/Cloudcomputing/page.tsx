@@ -53,7 +53,7 @@ const CloudComputingBlog = () => {
             className="flex items-center"
           >
             <FiClock className="mr-1.5 text-blue-400" />
-            September 3, 2025 · 9 min read
+            Apr 2, 2025 · 9 min read
           </motion.div>
         </div>
       </motion.header>

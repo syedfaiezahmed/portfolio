@@ -46,14 +46,14 @@ const CybersecurityBlog = () => {
             className="flex items-center"
           >
             <FiUser className="mr-1.5 text-purple-400" />
-            Digisparkify Team
+            Syed Faiez Ahmed
           </motion.div>
           <motion.div 
             whileHover={{ x: 3 }}
             className="flex items-center"
           >
             <FiClock className="mr-1.5 text-blue-400" />
-            August 12, 2025 · 7 min read
+            Mar 12, 2025 · 7 min read
           </motion.div>
         </div>
       </motion.header>
