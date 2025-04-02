@@ -187,76 +187,76 @@ export default function Contact() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                 {error && (
                   <div className="p-3 text-sm text-red-400 bg-red-900/20 rounded-md border border-red-800">
-                    {error}
+                  {error}
                   </div>
                 )}
 
                 <div>
                   <label
-                    htmlFor="name"
-                    className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
+                  htmlFor="name"
+                  className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
                   >
-                    Your Name
+                  Your Name
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiUser className="text-gray-400 text-sm md:text-base" />
-                    </div>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
-                      placeholder="John Doe"
-                    />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiUser className="text-gray-400 text-sm md:text-base" />
+                  </div>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
+                    placeholder="John Doe"
+                  />
                   </div>
                 </div>
 
                 <div>
                   <label
-                    htmlFor="email"
-                    className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
+                  htmlFor="email"
+                  className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
                   >
-                    Your Email
+                  Your Email
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <FiMail className="text-gray-400 text-sm md:text-base" />
-                    </div>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
-                      placeholder="john@example.com"
-                    />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FiMail className="text-gray-400 text-sm md:text-base" />
+                  </div>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
+                    placeholder="john@example.com"
+                  />
                   </div>
                 </div>
 
                 <div>
                   <label
-                    htmlFor="message"
-                    className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
+                  htmlFor="message"
+                  className="block text-xs md:text-sm font-medium text-[#ADB7BE] mb-1"
                   >
-                    Your Message
+                  Your Message
                   </label>
                   <div className="relative">
-                    <div className="absolute top-2.5 left-3">
-                      <FiMessageSquare className="text-gray-400 text-sm md:text-base" />
-                    </div>
-                    <textarea
-                      id="message"
-                      name="message"
-                      rows={4}
-                      value={formData.message}
-                      onChange={handleChange}
+                  <div className="absolute top-2.5 left-3">
+                    <FiMessageSquare className="text-gray-400 text-sm md:text-base" />
+                  </div>
+                  <textarea
+                    id="message"
+                    name="message"
+                    rows={4}
+                    value={formData.message}
+                    onChange={handleChange}
                       className="bg-[#252525] border border-[#333333] text-white text-xs md:text-sm rounded-md md:rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-9 md:pl-10 p-2 md:p-2.5"
                       placeholder="Let's talk about your project..."
                     />
