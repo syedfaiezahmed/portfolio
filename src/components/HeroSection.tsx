@@ -34,24 +34,26 @@ const HeroSection = () => {
             transition={{ duration: 0.5 }}
           >
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-700">
-              Hello, I'm {""}
+              Hello, I'm
             </span>
-            <br />
-            <TypeAnimation
-              sequence={[
-                "Syed Faiez Ahmed",
-                1000,
-                "Front-end Developer",
-                1000,
-                "Digital Marketer",
-                1000,
-                "Graphic Designer",
-                1000,
-              ]}
-              wrapper="span"
-              speed={30}
-              repeat={Infinity}
-            />
+            <br className="hidden sm:block" />
+            <div className="text-xl sm:text-5xl lg:text-5xl">
+              <TypeAnimation
+                sequence={[
+                  "Syed Faiez Ahmed",
+                  1000,
+                  "Front-end Developer",
+                  1000,
+                  "Digital Marketer",
+                  1000,
+                  "Graphic Designer",
+                  1000,
+                ]}
+                wrapper="span"
+                speed={30}
+                repeat={Infinity}
+              />
+            </div>
           </motion.h1>
 
           <motion.p 
